@@ -13,8 +13,6 @@ lazy val root = (project in file(".")).
     mainClass in Compile := Some("com.example.nubank.MyApplication")
   )
 
-parallelExecution in Test := false
-
 libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.0"
 
 // https://mvnrepository.com/artifact/commons-cli/commons-cli
@@ -33,5 +31,12 @@ libraryDependencies += "org.mockito" % "mockito-core" % "2.12.0" % "test"
 
 resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 resolvers += Resolver.mavenLocal
+
+mainClass in assembly := Some("com.example.nubank.MyApplication")
+
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", xs@_*) => MergeStrategy.discard
+  case x => MergeStrategy.first
+}
 
 
