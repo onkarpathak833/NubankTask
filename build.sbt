@@ -13,6 +13,7 @@ lazy val root = (project in file(".")).
     mainClass in Compile := Some("com.example.nubank.MyApplication")
   )
 
+parallelExecution in Test := false
 
 libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.0"
 

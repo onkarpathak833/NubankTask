@@ -60,7 +60,10 @@ class TransactionProcessor {
     else {
       val accountBalance = Account.availableLimit - transaction.amount
       Account.availableLimit = accountBalance
-      TransactionResponse(Some(Account(true, accountBalance)), List.empty[String])
+      transaction.registerTransaction
+      val updatedAccount = account.map(acc => acc.updateAccountLimit(accountBalance))
+      TransactionResponse(updatedAccount, List.empty[String])
+
     }
 
   }

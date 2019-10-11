@@ -1,6 +1,11 @@
 package com.example.nubank.domain
 
 case class Account(ActiveCard: Boolean, AvailableLimit: Int) {
+  def updateAccountLimit(accountBalance: Int): Account = {
+    Account.accountsList = List(Account(ActiveCard, accountBalance))
+    Account(ActiveCard, accountBalance)
+  }
+
 
   def apply(ActiveCard: Boolean, AvailableLimit: Int) = {
     Account.availableLimit = AvailableLimit

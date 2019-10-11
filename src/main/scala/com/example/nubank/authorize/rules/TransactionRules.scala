@@ -42,7 +42,7 @@ case class TransactionRules(transaction: Transaction, account: Option[Account]) 
   }
 
   private def noHighFrequencyTransactionsRule = {
-    if (Transaction.transactions.size > 3) {
+    if (Transaction.transactions.size >= 3) {
       val transactionList = Transaction.transactions.toList
       val currentTransactionTime: Instant = Instant.parse(transaction.time)
       val thirdLastTransaction: Instant = Instant.parse(Transaction.transactions.toList(transactionList.size - 3).time)
@@ -61,15 +61,15 @@ case class TransactionRules(transaction: Transaction, account: Option[Account]) 
   }
 
   private def noDoubledTransactions = {
-    if (Transaction.transactions.size > 1) {
+    if (Transaction.transactions.size >= 1) {
       val transactionList = Transaction.transactions.toList
       val currentTransactionTime = Instant.parse(transaction.time)
 
       val doubledTransactions = transactionList.
         filter(thisTransaction =>
           ChronoUnit.MINUTES.between(currentTransactionTime, Instant.parse(thisTransaction.time)) <= 2
-            && thisTransaction.merchant == transaction.merchant
-            && thisTransaction.amount == transaction.amount
+            && thisTransaction.merchant.equals(transaction.merchant)
+            && thisTransaction.amount.equals(transaction.amount)
         )
 
       if (doubledTransactions.isEmpty) {
