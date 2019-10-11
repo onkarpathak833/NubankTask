@@ -2,11 +2,11 @@
 
 This application runs transaction/operations against business rules and gives appropritae business specific response.
 
-#REQUIREMENTS
+# REQUIREMENTS
 
 jdk 1.8 and sbt version 1.3.2 for building a project
 
-#HOW TO BUILD?
+# HOW TO BUILD?
 
 From project root run command :
 sbt clean compile
@@ -30,11 +30,11 @@ This will give you output on stdout/console as :
 {"account":{"active-card":true,"available-limit":35},"violations":[]}
 {"account":{"active-card":true,"available-limit":35},"violations":["high-frequency-small-interval"]}
 
-#TEST
+# TESTS
 
 Unit and integration test are part of scala/test folder.
 
-#INPUT FILE
+# INPUT FILE
 
 sample input and output file are provided in test/resources folder.
 
