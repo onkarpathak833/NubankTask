@@ -4,14 +4,10 @@ import java.util
 
 import com.example.nubank.authorize.rules.TransactionRules
 import com.example.nubank.domain.{Account, Transaction, TransactionResponse}
-import com.google.gson.{FieldNamingPolicy, Gson, GsonBuilder}
-import javafx.scene.input.KeyCombination.Modifier
 import org.json.JSONObject
+import com.example.nubank.constants.TransactionConstants._
 
 class TransactionProcessor {
-
-  val gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create()
-
   def initializeAccount(): Unit = {
     Account.accountsList = List()
     Account.availableLimit = 0
@@ -22,17 +18,17 @@ class TransactionProcessor {
     val keysIterator: util.Iterator[_] = userTransaction.keys()
     val transactionType = keysIterator.next().toString
     transactionType match {
-      case "account" => {
+      case ACCOUNT_TYPE => {
         val accountObject: JSONObject = userTransaction.getJSONObject(transactionType)
-        val account: Account = Account(accountObject.getBoolean("active-card"), accountObject.getInt("available-limit"))
+        val account: Account = Account(accountObject.getBoolean(ACTIVE_CARD), accountObject.getInt(AVAILABLE_LIMIT))
         val response: TransactionResponse = validateAndCreateAccount(account)
         val responseData = response.createResponse()
         responseData
       }
 
-      case "transaction" => {
+      case TRANSACTION_TYPE => {
         val transactionObject = userTransaction.getJSONObject(transactionType)
-        val transaction = Transaction(transactionObject.getString("merchant"), transactionObject.getInt("amount"), transactionObject.getString("time"))
+        val transaction = Transaction(transactionObject.getString(MERCHANT), transactionObject.getInt(AMOUNT), transactionObject.getString(TIME))
         val account = Account.accountsList.headOption
         authorize(transaction, account).createResponse()
       }
@@ -43,7 +39,7 @@ class TransactionProcessor {
   private def validateAndCreateAccount(account: Account): TransactionResponse = {
     val accountCreateResponse = account.validateAndCreateAccount()
     if (accountCreateResponse) {
-      TransactionResponse(Some(account), List("account-already-initialized"))
+      TransactionResponse(Some(account), List(ACCOUNT_INITIALIZED_ERROR))
 
     }
     else {

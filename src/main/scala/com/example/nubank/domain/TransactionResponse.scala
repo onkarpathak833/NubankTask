@@ -1,8 +1,5 @@
 package com.example.nubank.domain
-
-import com.google.gson.annotations.Expose
-import com.google.gson.{FieldNamingPolicy, Gson, GsonBuilder}
-import org.json.{JSONArray, JSONObject}
+import com.example.nubank.constants.TransactionConstants._
 
 case class TransactionResponse(account: Option[Account], violations: List[String]) {
   def createResponse(): String = {

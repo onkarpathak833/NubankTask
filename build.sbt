@@ -30,9 +30,6 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % "test"
 
 libraryDependencies += "org.mockito" % "mockito-core" % "2.12.0" % "test"
 
-// https://mvnrepository.com/artifact/com.google.code.gson/gson
-libraryDependencies += "com.google.code.gson" % "gson" % "2.8.5"
-
 
 resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 resolvers += Resolver.mavenLocal

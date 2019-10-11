@@ -1,8 +1,9 @@
 package com.example.nubank.authorize.rules
 
-import java.time.Instant
+import java.time.{Duration, Instant, Period}
 import java.time.temporal.ChronoUnit
 
+import com.example.nubank.constants.TransactionConstants._
 import com.example.nubank.domain.{Account, Transaction, TransactionResponse}
 
 case class TransactionRules(transaction: Transaction, account: Option[Account]) {
@@ -16,7 +17,7 @@ case class TransactionRules(transaction: Transaction, account: Option[Account]) 
 
   private def unInitializedAccountRule: (Boolean, TransactionResponse) = {
     if (Account.accountsList.isEmpty) {
-      (false, TransactionResponse(account, List("account-not-initialized")))
+      (false, TransactionResponse(account, List(ACCOUNT_NOT_INITIALIZED)))
     }
     else {
       (true, TransactionResponse(account, List()))
@@ -25,7 +26,7 @@ case class TransactionRules(transaction: Transaction, account: Option[Account]) 
 
   private def cardInactiveRule = {
     if (!account.exists(_.ActiveCard)) {
-      (false, TransactionResponse(account, List("card-not-active")))
+      (false, TransactionResponse(account, List(CARD_NOT_ACTIVE)))
     }
     else {
       (true, TransactionResponse(account, List()))
@@ -34,7 +35,7 @@ case class TransactionRules(transaction: Transaction, account: Option[Account]) 
 
   private def transactionExceedsAvailableLimitRule = {
     if (transaction.amount > Account.availableLimit) {
-      (false, TransactionResponse(account, List("insufficient-limit")))
+      (false, TransactionResponse(account, List(INSUFFICIENT_LIMIT)))
     }
     else {
       (true, TransactionResponse(account, List()))
@@ -46,10 +47,9 @@ case class TransactionRules(transaction: Transaction, account: Option[Account]) 
       val transactionList = Transaction.transactions.toList
       val currentTransactionTime: Instant = Instant.parse(transaction.time)
       val thirdLastTransaction: Instant = Instant.parse(Transaction.transactions.toList(transactionList.size - 3).time)
-      val differenceBetweenCurrentAndThirdLastTransaction = ChronoUnit.MINUTES.between(currentTransactionTime, thirdLastTransaction)
-
-      if (differenceBetweenCurrentAndThirdLastTransaction <= 2) {
-        (false, TransactionResponse(account, List("high-frequency-small-interval")))
+      val timeDifferenceInSeconds: Long = Math.abs(Duration.between(currentTransactionTime, thirdLastTransaction).getSeconds)
+      if (timeDifferenceInSeconds <= 120) {
+        (false, TransactionResponse(account, List(HIGH_FREQUENCY_SMALL_INTERVAL)))
       }
       else {
         (true, TransactionResponse(account, List()))
@@ -66,17 +66,20 @@ case class TransactionRules(transaction: Transaction, account: Option[Account]) 
       val currentTransactionTime = Instant.parse(transaction.time)
 
       val doubledTransactions = transactionList.
-        filter(thisTransaction =>
-          ChronoUnit.MINUTES.between(currentTransactionTime, Instant.parse(thisTransaction.time)) <= 2
-            && thisTransaction.merchant.equals(transaction.merchant)
-            && thisTransaction.amount.equals(transaction.amount)
+        filter(thisTransaction => {
+          val timeInterval = Math.abs(Duration.between(currentTransactionTime, Instant.parse(thisTransaction.time)).getSeconds)
+          timeInterval <= 120 &&
+            thisTransaction.merchant.equals(transaction.merchant) &&
+            thisTransaction.amount.equals(transaction.amount)
+        }
+
         )
 
       if (doubledTransactions.isEmpty) {
         (true, TransactionResponse(account, List()))
       }
       else {
-        (false, TransactionResponse(account, List("doubled-transaction")))
+        (false, TransactionResponse(account, List(DOUBLED_TRANSACTION)))
       }
     }
     else {
