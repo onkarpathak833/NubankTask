@@ -1,12 +1,13 @@
 package com.example.nubank.authorize
 
 import com.example.nubank.domain.{Account, Transaction}
-import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
+import org.scalatest.{BeforeAndAfterEach, DoNotDiscover, Matchers, WordSpec}
 import org.scalatest.mockito.MockitoSugar
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
+@DoNotDiscover
 class TransactionProcessorIntegrationTest extends WordSpec with Matchers with MockitoSugar with BeforeAndAfterEach {
   var authorizer: TransactionProcessor = _
 

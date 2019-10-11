@@ -58,7 +58,7 @@ class TransactionProcessorTest extends WordSpec with Matchers with MockitoSugar 
     }
 
     "called for a transaction with insufficient balance" should {
-      "return appropriate response" in {
+      "return insuffiecient-limit violation response" in {
         val userTransaction1 = "{\"account\": {\"active-card\": true, \"available-limit\": 100}}"
         val firstAccountCreateRespone = "{\"account\":{\"active-card\":true,\"available-limit\":100},\"violations\":[]}"
         authorizer.processTransaction(userTransaction1) shouldBe (firstAccountCreateRespone)
@@ -70,7 +70,7 @@ class TransactionProcessorTest extends WordSpec with Matchers with MockitoSugar 
     }
 
     "called for a transaction with inactive card" should {
-      "return appropriate response" in {
+      "return card-not-active violation response" in {
         val userTransaction1 = "{\"account\": {\"active-card\": false, \"available-limit\": 100}}"
         val firstAccountCreateRespone = "{\"account\":{\"active-card\":false,\"available-limit\":100},\"violations\":[]}"
         authorizer.processTransaction(userTransaction1) shouldBe (firstAccountCreateRespone)
@@ -83,7 +83,7 @@ class TransactionProcessorTest extends WordSpec with Matchers with MockitoSugar 
     }
 
     "called for uninitialized account" should {
-      "return appropriate response" in {
+      "return account-not-initialized response" in {
         val userTransaction2 = "{\"transaction\": {\"merchant\": \"Burger King\", \"amount\": 80, \"time\": \"2019-02-13T10:00:00.000Z\"}}"
         val expectedResult = "{\"account\":{\"active-card\":None,\"available-limit\":None},\"violations\":[\"account-not-initialized\"]}"
         authorizer.processTransaction(userTransaction2) shouldBe (expectedResult)
@@ -91,7 +91,7 @@ class TransactionProcessorTest extends WordSpec with Matchers with MockitoSugar 
     }
 
     "called for high frequency small interval transactions" should {
-      "return appropriate response" in {
+      "return high frequency over small inerval response for more than 3 transaction over 2 minutes interval" in {
         val userTransaction1 = "{\"account\": {\"active-card\": true, \"available-limit\": 100}}"
         val firstAccountCreateRespone = "{\"account\":{\"active-card\":true,\"available-limit\":100},\"violations\":[]}"
         authorizer.processTransaction(userTransaction1) shouldBe (firstAccountCreateRespone)
@@ -114,7 +114,7 @@ class TransactionProcessorTest extends WordSpec with Matchers with MockitoSugar 
       }
     }
     "called for more than 1 similar transactions in 2 minutes interval" should {
-      "return 'doubled-transaction' error" in {
+      "return 'doubled-transaction' error for more than 1 transaction over 2 minutes inerval with same mnerchant and amount" in {
         val userTransaction1 = "{\"account\": {\"active-card\": true, \"available-limit\": 200}}"
         val firstAccountCreateRespone = "{\"account\":{\"active-card\":true,\"available-limit\":200},\"violations\":[]}"
         authorizer.processTransaction(userTransaction1) shouldBe (firstAccountCreateRespone)
